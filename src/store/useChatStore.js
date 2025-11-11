@@ -9,6 +9,7 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  unreadMessages: {},
 
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -16,7 +17,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get("/messages/users");
       set({ users: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to get users");
     } finally {
       set({ isUsersLoading: false });
     }
@@ -28,7 +29,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.get(`/messages/${userId}`);
       set({ messages: res.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to get messages");
     } finally {
       set({ isMessagesLoading: false });
     }
@@ -39,30 +40,50 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
       set({ messages: [...messages, res.data] });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Failed to send message");
     }
   },
 
   subscribeToMessages: () => {
-    const { selectedUser } = get();
-    if (!selectedUser) return;
+		const socket = useAuthStore.getState().socket;
+		if (!socket) return;
 
-    const socket = useAuthStore.getState().socket;
+		socket.off("newMessage"); // Remove old listener to prevent duplicates
 
-    socket.on("newMessage", (newMessage) => {
-      const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
+		// MODIFIED: This function now handles unread messages
+		socket.on("newMessage", (newMessage) => {
+			const { selectedUser, messages } = get();
+			const isMessageFromSelectedUser = newMessage.senderId === selectedUser?._id;
 
-      set({
-        messages: [...get().messages, newMessage],
-      });
-    });
-  },
+			if (isMessageFromSelectedUser) {
+				// User is already viewing this chat, add message directly
+				set({ messages: [...messages, newMessage] });
+			} else {
+				// It's from another user, mark as unread
+				toast.success(`New message from another user!`); // Optional: notify user
+				set((state) => ({
+					unreadMessages: { ...state.unreadMessages, [newMessage.senderId]: true },
+				}));
+			}
+		});
+	},
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
+    if (socket) {
+			socket.off("newMessage");
+		}
   },
 
-  setSelectedUser: (selectedUser) => set({ selectedUser }),
+  setSelectedUser: (selectedUser) => {
+		set((state) => {
+			// Create a copy of unreadMessages
+			const newUnreadMessages = { ...state.unreadMessages };
+			if (selectedUser) {
+				// Remove the selected user's ID from unread list
+				delete newUnreadMessages[selectedUser._id];
+			}
+			return { selectedUser, unreadMessages: newUnreadMessages };
+		});
+	},
 }));
