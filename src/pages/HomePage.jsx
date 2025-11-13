@@ -4,11 +4,13 @@ import Sidebar from "../components/Sidebar";
 import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 import ChatHeader from "../components/ChatHeader";
+import ChatDetailsPanel from "../components/ChatDetailsPanel";
 
 const HomePage = () => {
 	const { selectedUser } = useChatStore();
 	// Initialize sidebar state based on screen width
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+	const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(false);
 
 	// Handle window resize to show/hide sidebar appropriately
 	// useEffect(() => {
@@ -37,11 +39,16 @@ const HomePage = () => {
 
 			<main className='flex-1 flex flex-col'>
 				{/* The ChatHeader is now part of the main layout, ensuring the toggle is always visible */}
-				<ChatHeader setIsSidebarOpen={setIsSidebarOpen} />
+				<ChatHeader setIsSidebarOpen={setIsSidebarOpen} setIsDetailsPanelOpen={setIsDetailsPanelOpen} />
 
 				{/* Conditionally render the chat container or the placeholder */}
 				{!selectedUser ? <NoChatSelected /> : <ChatContainer />}
 			</main>
+
+			{isDetailsPanelOpen && (
+				<ChatDetailsPanel onClose={() => setIsDetailsPanelOpen(false)} />
+			)}
+
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { LogOut, Search, Settings } from "lucide-react";
 
 import { useChatStore } from "../store/useChatStore";
@@ -13,6 +13,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 	const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
 	const { authUser } = useAuthStore();
 	const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+	const [filter, setFilter] = useState("all");
 
 	useEffect(() => {
 		getUsers();
@@ -26,6 +27,15 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 		}
 	};
 
+	const filteredUsers = useMemo(() => {
+		if (filter === "favorites") {
+			// Return only users whose ID is in the authUser.favorites array
+			return users.filter((user) => authUser.favorites.includes(user._id));
+		}
+		// Otherwise, return all users
+		return users;
+	}, [filter, users, authUser.favorites]);
+
 	return (
 		<aside
 			className={`
@@ -37,7 +47,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 		>
 			{/* Sidebar Header */}
 			<div className='flex items-center justify-between p-4 border-b border-base-300'>
-				<h1 className='text-2xl font-bold'>MEMO CHAT</h1>
+				<h1 className='text-2xl font-bold'>Memo Chat</h1>
 				<ThemeToggle />
 			</div>
 
@@ -52,12 +62,29 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 					<Search className='absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-base-content/60' />
 				</div>
 			</div>
+			{/* Filter Buttons */}
+			<div className='px-4 pb-2'>
+				<div className='join flex'>
+					<button
+						className={`join-item btn btn-sm flex-1 ${filter === "all" ? "btn-primary" : ""}`}
+						onClick={() => setFilter("all")}
+					>
+						All
+					</button>
+					<button
+						className={`join-item btn btn-sm flex-1 ${filter === "favorites" ? "btn-primary" : ""}`}
+						onClick={() => setFilter("favorites")}
+					>
+						Favorites
+					</button>
+				</div>
+			</div>
 
 			{/* Contacts List */}
 			<div className='flex-1 overflow-y-auto px-2'>
 				{isUsersLoading && <SidebarSkeleton />}
 				{!isUsersLoading &&
-					users.map((user) => (
+					filteredUsers.map((user) => ( // <-- CHANGED from 'users' to 'filteredUsers'
 						<div
 							key={user._id}
 							onClick={() => handleSelectUser(user)}
@@ -74,7 +101,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 							</div>
 							<div>
 								<p className='font-semibold'>{user.fullName}</p>
-								<p className='text-sm text-base-content/60'>{user.bio || "Loves coffee & cats"}</p>
+								<p className='text-sm text-base-content/60'>{user.bio || "Im using Memo chat"}</p>
 							</div>
 						</div>
 					))}

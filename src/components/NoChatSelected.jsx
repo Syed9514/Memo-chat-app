@@ -1,13 +1,12 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import Ripple from "./Ripple";
-import MessageTag from "./MessageTag";
 import Particle from "./Particle";
+import { useAuthStore } from "../store/useAuthStore"; // Import the auth store
 
 // Your default messages
 const DEFAULT_MESSAGES = [
 	"Welcome to Memo chat",
-	"hello user",
+	"hello user", // This will be replaced by the authUser name
 	"do you like this app",
 	"i know there are less features",
 	"but soon new updates will come",
@@ -18,42 +17,38 @@ const DEFAULT_MESSAGES = [
 const particleArray = Array.from({ length: 15 }, (_, i) => ({ id: i }));
 
 const NoChatSelected = () => {
+	// Get the authenticated user
+	const { authUser } = useAuthStore();
+
 	// State for the main system
 	const [isVisible, setIsVisible] = useState(true);
 	const [animationState, setAnimationState] = useState("idle"); // 'idle', 'interacting', 'finale'
 	const [messageIndex, setMessageIndex] = useState(0);
 
-	// State for spawned components
-	const [ripples, setRipples] = useState([]);
-	const [currentMessage, setCurrentMessage] = useState(null);
+	// Dynamically replace "hello user" with the actual username
+	const messages = useMemo(() => {
+		return DEFAULT_MESSAGES.map((msg) =>
+			msg === "hello user" ? `Hello, ${authUser.fullName}` : msg
+		);
+	}, [authUser.fullName]);
 
 	const handleOrbClick = () => {
 		// Don't allow clicks if busy
 		if (animationState === "interacting" || animationState === "finale" || !isVisible) return;
 
-		// 1. Set to "interacting"
+		// 1. Set to "interacting" to make particles speed up
 		setAnimationState("interacting");
 
-		// 2. Spawn a Ripple
-		const rippleId = Date.now();
-		setRipples((prev) => [...prev, rippleId]);
-
-		// 3. Get the next message
-		const messageText = DEFAULT_MESSAGES[messageIndex];
-
-		if (messageText) {
-			// Show the message
-			setCurrentMessage({ id: rippleId, text: messageText });
+		// 2. Check if we are at the end of the message list
+		if (messageIndex < messages.length - 1) {
+			// Not at the end: just show the next message
+			setMessageIndex((prev) => prev + 1);
+			// Reset to idle after a short "pop"
+			setTimeout(() => setAnimationState("idle"), 300);
 		} else {
-			// No more messages, run the finale
+			// At the end: run the finale
 			runFinale();
 		}
-	};
-
-	const handleMessageRead = () => {
-		setCurrentMessage(null);
-		setMessageIndex((prev) => prev + 1); // Move to next message
-		setAnimationState("idle"); // Return to idle state
 	};
 
 	const runFinale = () => {
@@ -76,9 +71,9 @@ const NoChatSelected = () => {
 	const orbClassName = useMemo(() => {
 		switch (animationState) {
 			case "finale":
-				return "animate-finale-spin-out bg-base-100 shadow-[0_0_50px_20px_hsl(var(--bc))]"; // Bright white/black glow
+				return "animate-finale-spin-out bg-base-100 shadow-[0_0_50px_20px_hsl(var(--bc))]";
 			case "interacting":
-				return "shadow-[0_0_40px_15px_hsl(var(--p)/0.7)] scale-105"; // Brighter glow
+				return "shadow-[0_0_40px_15px_hsl(var(--p)/0.7)] scale-105";
 			case "idle":
 			default:
 				return "animate-pulse-glow";
@@ -90,41 +85,47 @@ const NoChatSelected = () => {
 			<AnimatePresence>
 				{isVisible && (
 					<motion.div
-						className='relative w-40 h-40 flex items-center justify-center'
+						className='flex flex-col items-center gap-12' // Main container for all 3 elements
 						initial={{ opacity: 0, scale: 0.5 }}
 						animate={{ opacity: 1, scale: 1 }}
 						exit={{ opacity: 0, scale: 0.5 }}
 						transition={{ duration: 0.5 }}
 					>
-						{/* 1. The Particles */}
-						{particleArray.map((p) => (
-							<Particle key={p.id} state={animationState} />
-						))}
+						{/* 1. The Title */}
+						<h2 className='text-2xl font-bold text-base-content text-center'>
+							{messages[messageIndex] === `Hello, ${authUser.fullName}`
+								? messages[messageIndex]
+								: `Hello, ${authUser.fullName}`}
+						</h2>
 
-						{/* 2. The Orb */}
-						<motion.button
-							className={`w-28 h-28 rounded-full transition-all duration-300 ${orbClassName}`}
-							onClick={handleOrbClick}
-							whileTap={animationState === "idle" ? { scale: 0.9 } : {}}
-              style={{
-								backgroundImage: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)",
-              }}
-            />
+						{/* 2. The Orb Container */}
+						<div className='relative w-40 h-40 flex items-center justify-center'>
+							{/* Particles */}
+							{particleArray.map((p) => (
+								<Particle key={p.id} state={animationState} />
+							))}
 
-						{/* 3. The Ripples */}
-						{ripples.map((id) => (
-							<Ripple
-								key={id}
-								onComplete={() => setRipples((prev) => prev.filter((r) => r !== id))}
+							{/* The Orb */}
+							<motion.button
+								className={`w-28 h-28 rounded-full transition-all duration-300 ${orbClassName}`}
+								onClick={handleOrbClick}
+								whileTap={animationState === "idle" ? { scale: 0.9 } : {}}
+								style={{
+									backgroundImage: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)",
+								}}
 							/>
-						))}
+						</div>
 
-						{/* 4. The Message Tag */}
-						<AnimatePresence>
-							{currentMessage && (
-								<MessageTag message={currentMessage.text} onRead={handleMessageRead} />
-							)}
-						</AnimatePresence>
+						{/* 3. The Message Area */}
+						<motion.p
+							key={messageIndex} // This makes Framer Motion re-run the animation
+							className='text-base-content/70 text-lg text-center h-12'
+							initial={{ opacity: 0, y: 10 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ duration: 0.3 }}
+						>
+							{messages[messageIndex]}
+						</motion.p>
 					</motion.div>
 				)}
 			</AnimatePresence>

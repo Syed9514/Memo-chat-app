@@ -88,17 +88,21 @@ const MessageInput = () => {
 
           <button
             type="button"
-            className={`hidden sm:flex btn btn-circle
+            className={`btn btn-circle 
                      ${imagePreview ? "text-emerald-500" : "text-zinc-400"}`}
             onClick={() => fileInputRef.current?.click()}
+            
           >
-            <Paperclip size={20} />
+            <Paperclip size={22} />
           </button>
         </div>
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-circle"
           disabled={!text.trim() && !imagePreview}
+          // style={{
+          //   backgroundImage: "linear-gradient(to top, #cd9cf2 0%, #f6f3ff 100%)",
+          // }}
         >
           <SendHorizontal size={22} />
         </button>

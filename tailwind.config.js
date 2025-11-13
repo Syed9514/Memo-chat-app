@@ -11,6 +11,11 @@ export default {
               "0%": { transform: "translateY(100%)" },
               "100%": { transform: "translateY(0)" },
               },
+
+              "slide-in-right": {
+                "0%": { transform: "translateX(100%)" },
+                "100%": { transform: "translateX(0)" },
+              },
             
               // 1. Orb's idle "breathing"
               "pulse-glow": {
@@ -43,6 +48,7 @@ export default {
 
             animation: {
               "slide-up": "slide-up 0.3s ease-out forwards",
+              "slide-in-right": "slide-in-right 0.3s ease-out forwards",
               "pulse-glow": "pulse-glow 4s ease-in-out infinite",
               "wave-ripple": "wave-ripple 1s ease-out forwards",
               "pop-in": "pop-in 0.3s ease-out forwards",

@@ -82,6 +82,36 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  toggleFavorite: async (userId) => {
+		try {
+			// Call the new backend endpoint
+			await axiosInstance.post(`/users/toggle-favorite/${userId}`);
+
+			// Update the authUser state locally for an instant UI change
+			set((state) => {
+				const isFavorite = state.authUser.favorites.includes(userId);
+				let newFavorites;
+
+				if (isFavorite) {
+					// Remove from favorites
+					newFavorites = state.authUser.favorites.filter((id) => id !== userId);
+				} else {
+					// Add to favorites
+					newFavorites = [...state.authUser.favorites, userId];
+				}
+
+				return {
+					authUser: { ...state.authUser, favorites: newFavorites },
+				};
+			});
+
+			toast.success("Favorites updated!");
+		} catch (error) {
+			console.log("Error in toggleFavorite:", error);
+			toast.error(error.response.data.message);
+		}
+	},
+
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;

@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Camera, LogOut, X } from "lucide-react";
+import { Save, Edit3, Camera, LogOut, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 const SettingsPanel = ({ onClose }) => {
 	const { authUser, isUpdatingProfile, updateProfile, logout } = useAuthStore();
+	const [bio, setBio] = useState(authUser.bio || "");
 	const [selectedImg, setSelectedImg] = useState(null);
 
 	const handleImageUpload = async (e) => {
@@ -18,6 +20,15 @@ const SettingsPanel = ({ onClose }) => {
 			setSelectedImg(base64Image);
 			await updateProfile({ profilePic: base64Image });
 		};
+	};
+
+	const handleSaveBio = async () => {
+		if (bio === authUser.bio) return; // No changes
+		if (bio.length > 150) {
+			toast.error("Bio must be 150 characters or less");
+			return;
+		}
+		await updateProfile({ bio: bio });
 	};
 
 	return (
@@ -68,13 +79,43 @@ const SettingsPanel = ({ onClose }) => {
 					<p className='font-bold text-lg'>{authUser.fullName}</p>
 					<p className='text-sm text-base-content/60'>{authUser.email}</p>
 				</div>
+
+				<div className='form-control'>
+					<label className='label'>
+						<span className='label-text flex items-center gap-2'>
+							<Edit3 size={14} />
+							Your Bio (max 150)
+						</span>
+						<span className='label-text-alt'>{bio.length}/150</span>
+					</label>
+					<textarea
+						className='textarea textarea-bordered h-24'
+						placeholder='Tell everyone a little about yourself...'
+						value={bio}
+						onChange={(e) => setBio(e.target.value)}
+						maxLength={150}
+					></textarea>
+				</div>
+
 			</div>
 
 			{/* Panel Footer */}
 			<div className='p-4 border-t border-base-300'>
-				<button className='btn btn-error btn-block gap-2' onClick={logout}>
+				<button className='btn btn-error gap-2' onClick={logout}>
 					<LogOut size={16} />
 					Logout
+				</button>
+				<button
+					className='btn btn-primary gap-2'
+					onClick={handleSaveBio}
+					disabled={isUpdatingProfile}
+				>
+					{isUpdatingProfile ? (
+						<span className='loading loading-spinner loading-xs' />
+					) : (
+						<Save size={16} />
+					)}
+					Save
 				</button>
 			</div>
 		</div>

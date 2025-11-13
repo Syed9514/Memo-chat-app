@@ -1,8 +1,8 @@
-import { MessageCircleDashed, X } from "lucide-react";
+import { Info, MessageSquare, X } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 
-const ChatHeader = ({ setIsSidebarOpen }) => {
+const ChatHeader = ({ setIsSidebarOpen, setIsDetailsPanelOpen }) => {
 	const { selectedUser, setSelectedUser } = useChatStore();
 	const { onlineUsers } = useAuthStore();
 
@@ -11,8 +11,8 @@ const ChatHeader = ({ setIsSidebarOpen }) => {
 			<div className='flex items-center justify-between'>
 				<div className='flex items-center gap-3'>
 					{/* Hamburger menu is always visible on mobile */}
-					<button className='btn btn-ghost btn-circle md:hidden' onClick={() => setIsSidebarOpen(true)}>
-						<MessageCircleDashed />
+					<button className='btn btn-circle md:hidden' onClick={() => setIsSidebarOpen(true)}>
+						<MessageSquare />
 					</button>
 
 					{/* Conditionally render user info only if a user is selected */}
@@ -39,9 +39,21 @@ const ChatHeader = ({ setIsSidebarOpen }) => {
 
 				{/* Close chat button, only shown when a chat is active */}
 				{selectedUser && (
-					<button className='btn btn-ghost btn-circle' onClick={() => setSelectedUser(null)}>
-						<X />
-					</button>
+					<div className='flex items-center'>
+						{/* --- ADD THIS BUTTON --- */}
+						<button
+							className='btn btn-ghost btn-circle'
+							onClick={() => setIsDetailsPanelOpen(true)}
+						>
+							<Info />
+						</button>
+						<button
+							className='btn btn-ghost btn-circle'
+							onClick={() => setSelectedUser(null)}
+						>
+							<X />
+						</button>
+					</div>
 				)}
 			</div>
 		</div>
