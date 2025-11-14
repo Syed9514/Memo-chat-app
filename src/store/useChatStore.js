@@ -10,6 +10,7 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
   unreadMessages: {},
+  isTyping: false,
 
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -49,6 +50,8 @@ export const useChatStore = create((set, get) => ({
 		if (!socket) return;
 
 		socket.off("newMessage"); // Remove old listener to prevent duplicates
+    socket.off("typing");
+		socket.off("stop_typing");
 
 		// MODIFIED: This function now handles unread messages
 		socket.on("newMessage", (newMessage) => {
@@ -57,21 +60,48 @@ export const useChatStore = create((set, get) => ({
 
 			if (isMessageFromSelectedUser) {
 				// User is already viewing this chat, add message directly
-				set({ messages: [...messages, newMessage] });
+				set({ messages: [...messages, newMessage], isTyping: false });
 			} else {
 				// It's from another user, mark as unread
 				toast.success(`New message from another user!`); // Optional: notify user
-				set((state) => ({
-					unreadMessages: { ...state.unreadMessages, [newMessage.senderId]: true },
-				}));
+				set((state) => {
+					const newUnread = {
+						...state.unreadMessages,
+						[newMessage.senderId]: (state.unreadMessages[newMessage.senderId] || 0) + 1,
+					};
+
+					// --- ADD THIS LOG ---
+					console.log("UNREAD MESSAGES STATE UPDATED:", newUnread);
+					
+					return { unreadMessages: newUnread };
+				});
 			}
 		});
+
+    // Listen for *who* is typing
+		socket.on("typing", (senderId) => {
+      console.log("Typing event HEARD from sender:", senderId);
+			const { selectedUser } = get();
+      console.log("Currently selected user:", selectedUser?._id);
+			// Only show typing if it's from the selected user
+			if (senderId === selectedUser?._id) {
+				set({ isTyping: true });
+			}
+		});
+
+		socket.on("stop_typing", () => {
+      console.log("Stop_typing event HEARD");
+			set({ isTyping: false });
+		});
+
 	},
 
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
     if (socket) {
 			socket.off("newMessage");
+      socket.off("typing");
+			socket.off("stop_typing");
 		}
   },
 
@@ -83,7 +113,7 @@ export const useChatStore = create((set, get) => ({
 				// Remove the selected user's ID from unread list
 				delete newUnreadMessages[selectedUser._id];
 			}
-			return { selectedUser, unreadMessages: newUnreadMessages };
+			return { selectedUser, unreadMessages: newUnreadMessages, isTyping: false };
 		});
 	},
 }));

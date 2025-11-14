@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore";
 import { Paperclip, SendHorizontal, X } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -7,7 +8,41 @@ const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
+  const { sendMessage, selectedUser } = useChatStore();
+  const { socket } = useAuthStore();
+
+  const typingTimeoutRef = useRef(null);
+
+	const handleTyping = (e) => {
+		setText(e.target.value);
+
+		if (!socket || !selectedUser) return;
+
+		// Emit "typing" on first keypress
+		if (!typingTimeoutRef.current) {
+			socket.emit("typing", { receiverId: selectedUser._id });
+		}
+
+		// Clear existing timer
+		if (typingTimeoutRef.current) {
+			clearTimeout(typingTimeoutRef.current);
+		}
+
+		// Set a new timer
+		typingTimeoutRef.current = setTimeout(() => {
+			socket.emit("stop_typing", { receiverId: selectedUser._id });
+			typingTimeoutRef.current = null;
+		}, 1500); // 1.5 seconds after user stops typing
+	};
+
+	// Clean up timer on unmount
+	useEffect(() => {
+		return () => {
+			if (typingTimeoutRef.current) {
+				clearTimeout(typingTimeoutRef.current);
+			}
+		};
+	}, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -31,6 +66,12 @@ const MessageInput = () => {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!text.trim() && !imagePreview) return;
+
+    if (socket && selectedUser && typingTimeoutRef.current) {
+			clearTimeout(typingTimeoutRef.current);
+			typingTimeoutRef.current = null;
+			socket.emit("stop_typing", { receiverId: selectedUser._id });
+		}
 
     try {
       await sendMessage({
@@ -76,7 +117,7 @@ const MessageInput = () => {
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTyping}
           />
           <input
             type="file"

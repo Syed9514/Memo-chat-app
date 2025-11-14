@@ -80,7 +80,7 @@ const SettingsPanel = ({ onClose }) => {
 					<p className='text-sm text-base-content/60'>{authUser.email}</p>
 				</div>
 
-				<div className='form-control'>
+				<div className='form-control relative'>
 					<label className='label'>
 						<span className='label-text flex items-center gap-2'>
 							<Edit3 size={14} />
@@ -95,27 +95,26 @@ const SettingsPanel = ({ onClose }) => {
 						onChange={(e) => setBio(e.target.value)}
 						maxLength={150}
 					></textarea>
+					<button
+						className='btn btn-primary btn-circle btn-sm absolute bottom-3 right-3'
+						onClick={handleSaveBio}
+						disabled={isUpdatingProfile}
+					>
+						{isUpdatingProfile ? (
+							<span className='loading loading-spinner loading-xs' />
+						) : (
+							<Save size={16} />
+						)}
+					</button>
 				</div>
 
 			</div>
 
 			{/* Panel Footer */}
 			<div className='p-4 border-t border-base-300'>
-				<button className='btn btn-error gap-2' onClick={logout}>
+				<button className='btn btn-error btn-block gap-2' onClick={logout}>
 					<LogOut size={16} />
 					Logout
-				</button>
-				<button
-					className='btn btn-primary gap-2'
-					onClick={handleSaveBio}
-					disabled={isUpdatingProfile}
-				>
-					{isUpdatingProfile ? (
-						<span className='loading loading-spinner loading-xs' />
-					) : (
-						<Save size={16} />
-					)}
-					Save
 				</button>
 			</div>
 		</div>

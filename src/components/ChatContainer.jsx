@@ -4,6 +4,8 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
+import TypingIndicator from "./TypingIndicator"; // --- 1. IMPORT IT ---
+import { AnimatePresence } from "framer-motion";
 
 const ChatContainer = () => {
   const {
@@ -13,6 +15,7 @@ const ChatContainer = () => {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    isTyping,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
@@ -29,7 +32,7 @@ const ChatContainer = () => {
     if (messageEndRef.current && messages) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   if (isMessagesLoading) {
     return (
@@ -80,6 +83,11 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+        <AnimatePresence>
+					{isTyping && <TypingIndicator />}
+				</AnimatePresence>
+        
+        <div ref={messageEndRef} />
       </div>
 
       <MessageInput />
