@@ -55,6 +55,7 @@ export const useChatStore = create((set, get) => ({
 
 		// MODIFIED: This function now handles unread messages
 		socket.on("newMessage", (newMessage) => {
+      console.log("NEW MESSAGE RECEIVED, INSPECT THIS OBJECT:", newMessage);
 			const { selectedUser, messages } = get();
 			const isMessageFromSelectedUser = newMessage.senderId === selectedUser?._id;
 

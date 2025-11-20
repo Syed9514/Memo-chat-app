@@ -6,6 +6,8 @@ import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import ThemeToggle from "./ThemeToggle";
 import SettingsPanel from "./SettingsPanel";
+import MemoLogo from "./MemoLogo";
+import Avatar from "./Avatar";
 // We will create SettingsPanel in the next step
 // import SettingsPanel from "./SettingsPanel"; 
 
@@ -57,7 +59,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 		>
 			{/* Sidebar Header */}
 			<div className='flex items-center justify-between p-4 border-b border-base-300'>
-				<h1 className='text-2xl font-bold'>Memo Chat</h1>
+				<MemoLogo />
 				<ThemeToggle />
 			</div>
 

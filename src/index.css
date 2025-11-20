@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  /* Chrome, Safari, Edge */
+  ::-webkit-scrollbar {
+    width: 5px; /* Very thin */
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent; /* Allows the theme background to show through */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-base-300 rounded-full; /* Adapts to light/dark mode automatically */
+    border: 1px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-base-content/50; /* Darker on hover */
+  }
+}
