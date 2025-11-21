@@ -89,7 +89,7 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="p-4 w-full">
+    <div className="w-full p-4 bg-base-100/80 backdrop-blur-lg shadow-[0_-5px_20px_-5px_rgba(var(--p),0.2)] border-t border-base-300 sticky bottom-0 z-10">
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
@@ -139,13 +139,19 @@ const MessageInput = () => {
         </div>
         <button
           type="submit"
-          className="btn btn-circle"
           disabled={!text.trim() && !imagePreview}
-          // style={{
-          //   backgroundImage: "linear-gradient(to top, #cd9cf2 0%, #f6f3ff 100%)",
-          // }}
+          className={`
+            btn btn-circle btn-sm sm:btn-md border-none
+            shadow-[0_0_10px_rgba(161,196,253,0.5)] hover:shadow-[0_0_20px_rgba(161,196,253,0.7)]
+            transition-all duration-300 transform hover:scale-105 active:scale-95
+            disabled:opacity-50 disabled:cursor-allowed
+          `}
+          style={{
+            background: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)",
+          }}
         >
-          <SendHorizontal size={22} />
+          {/* Using a dark gray icon (#374151) for high contrast against the bright blue */}
+          <SendHorizontal size={20} color="#374151" className="ml-0.5" />
         </button>
       </form>
     </div>

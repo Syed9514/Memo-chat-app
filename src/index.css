@@ -22,3 +22,25 @@
     @apply bg-base-content/50; /* Darker on hover */
   }
 }
+
+@layer components {
+  /* 1. GLOW SEPARATOR (Revised) */
+  /* Applies glow to any theme that isn't 'light' */
+  [data-theme]:not([data-theme="light"]) .glow-separator {
+    border-bottom: 1px solid transparent;
+    box-shadow: 0 4px 15px -3px rgba(161, 196, 253, 0.3); /* Matches the Orb color */
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Fallback for light theme (clean line) */
+  [data-theme="light"] .glow-separator {
+    border-bottom: 1px solid #e5e7eb; /* base-300 equivalent */
+  }
+
+  /* 2. ORB GRADIENT UTILITIES */
+  /* Defines the gradient variable for reuse */
+  :root {
+    --orb-gradient: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  }
+}

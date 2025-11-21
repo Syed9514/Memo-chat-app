@@ -7,7 +7,7 @@ const ChatHeader = ({ setIsSidebarOpen, setIsDetailsPanelOpen }) => {
 	const { onlineUsers } = useAuthStore();
 
 	return (
-		<div className='p-2.5 border-b border-base-300 bg-base-100/80 backdrop-blur-lg flex-shrink-0'>
+		<div className='p-2.5 glow-separator bg-base-100/80 backdrop-blur-lg flex-shrink-0'>
 			<div className='flex items-center justify-between'>
 				<div className='flex items-center gap-3'>
 					{/* Hamburger menu is always visible on mobile */}

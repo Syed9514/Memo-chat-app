@@ -1,79 +1,35 @@
-import { useState, useEffect } from "react";
-import { MessageSquare } from "lucide-react"; // Or your own logo import
+import { motion } from "framer-motion";
+import { MessageSquare } from "lucide-react";
 
 const MemoLogo = () => {
-  // States: 'title' | 'icon' | 'combined'
-  const [displayMode, setDisplayMode] = useState("title");
-
-  useEffect(() => {
-    // After 4 seconds, automatically morph into the full logo + text
-    const timer = setTimeout(() => {
-      setDisplayMode("combined");
-    }, 4000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleToggle = () => {
-    // If we are already in the final 'combined' state, do nothing (or toggle back if you prefer)
-    if (displayMode === "combined") return;
-
-    // Otherwise, toggle between Title and Icon
-    setDisplayMode((prev) => (prev === "title" ? "icon" : "title"));
-  };
+  const title = "Memo Chat";
 
   return (
-    <div
-      onClick={handleToggle}
-      className={`
-        relative flex items-center justify-center cursor-pointer
-        border border-primary/20 
-        rounded-full 
-        transition-all duration-700 ease-in-out
-        hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] 
-        bg-base-100/50 backdrop-blur-sm
-        ${
-          displayMode === "combined"
-            ? "px-5 py-2 gap-3 border-primary/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-            : "px-3 py-2 gap-0 shadow-[0_0_10px_rgba(59,130,246,0.1)]" // Tighter padding for single items
-        }
-      `}
-    >
-      {/* --- LOGO SECTION --- */}
-      {/* Visible in 'icon' and 'combined' modes */}
-      <div
-        className={`
-          flex items-center justify-center
-          transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-          ${
-            displayMode === "title"
-              ? "w-0 opacity-0 -translate-x-4 overflow-hidden" // Hidden
-              : "w-8 opacity-100 translate-x-0" // Visible
-          }
-        `}
-      >
-        <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-          <MessageSquare className="w-5 h-5" />
-        </div>
+    <div className="flex items-center gap-2 select-none">
+      {/* 1. Static Icon (Brand Mark) */}
+      <div className="size-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+        <MessageSquare className="size-5 font-bold" />
       </div>
 
-      {/* --- TITLE SECTION --- */}
-      {/* Visible in 'title' and 'combined' modes */}
-      <div
-        className={`
-          overflow-hidden whitespace-nowrap
-          transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]
-          ${
-            displayMode === "icon"
-              ? "w-0 opacity-0 translate-x-4" // Hidden
-              : "w-auto opacity-100 translate-x-0" // Visible
-          }
-        `}
-      >
-        <span className={`font-bold text-xl text-primary block ${displayMode === 'combined' && "pl-0"}`}>
-          Memo Chat
-        </span>
-      </div>
+      {/* 2. Animated Text */}
+      <h1 className="text-lg font-bold tracking-tight flex text-base-content/90">
+        {title.split("").map((letter, index) => (
+          <motion.span
+            key={index}
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{
+              duration: 0.5,
+              delay: index * 0.1, // Staggered delay for "typing" effect
+              type: "spring",     // Adds a tiny bit of bounce
+              stiffness: 200
+            }}
+          >
+            {/* Handle spaces correctly in flex containers */}
+            {letter === " " ? "\u00A0" : letter}
+          </motion.span>
+        ))}
+      </h1>
     </div>
   );
 };
