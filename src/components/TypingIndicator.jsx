@@ -2,63 +2,63 @@ import { motion } from "framer-motion";
 import { useChatStore } from "../store/useChatStore";
 
 const TypingIndicator = () => {
-	const { selectedUser } = useChatStore();
+  const { selectedUser } = useChatStore();
 
-	// SVG arc properties
-	const radius = 22;
-	const circumference = 2 * Math.PI * radius;
+  return (
+    <motion.div
+      className="chat chat-start mb-2"
+      initial={{ opacity: 0, y: 10, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.9 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="chat-image avatar">
+        <div className="size-10 rounded-full overflow-hidden">
+          <img
+            src={selectedUser?.profilePic || "/avatar.png"}
+            alt="User Avatar"
+            className="object-cover w-full h-full"
+          />
+        </div>
+      </div>
 
-	return (
-		<motion.div
-			className='chat chat-start'
-			initial={{ opacity: 0, y: 10 }}
-			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: 10 }}
-			transition={{ duration: 0.3 }}
-		>
-			<div className='chat-image avatar'>
-				<div className='w-10 rounded-full relative'>
-					<img
-						src={selectedUser?.profilePic || "/avatar.png"}
-						alt='Typing user'
-						className='rounded-full'
-					/>
-					{/* Animated border */}
-					<svg className='absolute -top-1 -left-1 w-12 h-12' viewBox='0 0 50 50'>
-						{/* Background track */}
-						<circle
-							cx='25'
-							cy='25'
-							r={radius}
-							fill='transparent'
-							stroke='hsl(var(--b2))' // base-200
-							strokeWidth='3'
-						/>
-						{/* Animated progress circle */}
-						<motion.circle
-							cx='25'
-							cy='25'
-							r={radius}
-							fill='transparent'
-							stroke='hsl(var(--p))' // primary color
-							strokeWidth='3'
-							strokeLinecap='round'
-							strokeDasharray={circumference}
-							strokeDashoffset={circumference}
-							animate={{ strokeDashoffset: [circumference, 0, circumference] }}
-							transition={{
-								duration: 1.5,
-								repeat: Infinity,
-								ease: "linear",
-							}}
-							transform='rotate(-90 25 25)' // Start from the top
-						/>
-					</svg>
-				</div>
-			</div>
-			<div className='chat-bubble'>...</div>
-		</motion.div>
-	);
+      <div className="chat-bubble bg-base-200 p-4 flex items-center gap-1.5">
+        {/* Dot 1 */}
+        <motion.div
+          className="w-2 h-2 bg-base-content/50 rounded-full"
+          animate={{ y: [0, -5, 0] }}
+          transition={{
+            duration: 0.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0,
+          }}
+        />
+        {/* Dot 2 */}
+        <motion.div
+          className="w-2 h-2 bg-base-content/50 rounded-full"
+          animate={{ y: [0, -5, 0] }}
+          transition={{
+            duration: 0.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.2,
+          }}
+        />
+        {/* Dot 3 */}
+        <motion.div
+          className="w-2 h-2 bg-base-content/50 rounded-full"
+          animate={{ y: [0, -5, 0] }}
+          transition={{
+            duration: 0.6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.4,
+          }}
+        />
+      </div>
+    </motion.div>
+  );
 };
 
 export default TypingIndicator;
