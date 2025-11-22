@@ -33,7 +33,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 
 		// First, filter by "All" or "Favorites"
 		if (filter === "favorites") {
-			usersToShow = users.filter((user) => authUser.favorites.includes(user._id));
+			usersToShow = users.filter((user) => (authUser.favorites || []).includes(user._id));
 		}
 
 		// Then, filter by the search term

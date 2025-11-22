@@ -89,15 +89,16 @@ export const useAuthStore = create((set, get) => ({
 
 			// Update the authUser state locally for an instant UI change
 			set((state) => {
+        const currentFavorites = state.authUser.favorites || [];
 				const isFavorite = state.authUser.favorites.includes(userId);
 				let newFavorites;
 
 				if (isFavorite) {
 					// Remove from favorites
-					newFavorites = state.authUser.favorites.filter((id) => id !== userId);
+					newFavorites = currentFavorites.filter((id) => id !== userId);
 				} else {
 					// Add to favorites
-					newFavorites = [...state.authUser.favorites, userId];
+					newFavorites = [...currentFavorites, userId];
 				}
 
 				return {

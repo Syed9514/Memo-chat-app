@@ -93,7 +93,8 @@ const ChatContainer = () => {
   }, [selectedUser]);
 
   const isFavorite = useMemo(() => {
-    return authUser.favorites.includes(selectedUser._id);
+    // FIX: Add (authUser.favorites || []) to prevent crash if favorites is undefined
+    return (authUser.favorites || []).includes(selectedUser._id);
   }, [authUser.favorites, selectedUser._id]);
 
   if (isMessagesLoading) {

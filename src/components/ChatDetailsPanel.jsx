@@ -11,7 +11,7 @@ const ChatDetailsPanel = ({ onClose }) => {
   const [selectedImgIndex, setSelectedImgIndex] = useState(null);
 
   const isFavorite = useMemo(() => {
-    return authUser.favorites.includes(selectedUser?._id);
+    return (authUser.favorites || []).includes(selectedUser?._id);
   }, [authUser.favorites, selectedUser]);
 
   const sharedMedia = useMemo(() => {
