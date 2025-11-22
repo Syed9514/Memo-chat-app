@@ -80,22 +80,25 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 				<div className='flex items-center gap-2'>
 					<button
 						className={`
-              flex-1 btn btn-sm rounded-full normal-case border-none transition-all duration-300
-              ${filter === "all" 
-                ? "bg-primary text-primary-content shadow-lg shadow-primary/25 hover:bg-primary" 
-                : "bg-base-200 text-base-content/60 hover:bg-base-300"}
-            `}
+							flex-1 btn btn-sm rounded-full normal-case border-none transition-all duration-300
+							${filter === "all" 
+							? "text-[#374151] shadow-lg shadow-[#a1c4fd]/20" // UPDATED: Dark text + colored shadow
+							: "bg-base-200 text-base-content/60 hover:bg-base-300"}
+						`}
+						// ADD THIS STYLE PROP:
+						style={{ background: filter === "all" ? "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)" : "" }}
 						onClick={() => setFilter("all")}
 					>
 						All
 					</button>
 					<button
 						className={`
-              flex-1 btn btn-sm rounded-full normal-case border-none transition-all duration-300
-              ${filter === "favorites" 
-                ? "bg-primary text-primary-content shadow-lg shadow-primary/25 hover:bg-primary" 
-                : "bg-base-200 text-base-content/60 hover:bg-base-300"}
-            `}
+							flex-1 btn btn-sm rounded-full normal-case border-none transition-all duration-300
+							${filter === "favorites" 
+							? "text-[#374151] shadow-lg shadow-[#a1c4fd]/20" 
+							: "bg-base-200 text-base-content/60 hover:bg-base-300"}
+						`}
+						style={{ background: filter === "favorites" ? "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)" : "" }}
 						onClick={() => setFilter("favorites")}
 					>
 						Favorites
@@ -125,7 +128,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
 								className={`
                   w-full p-3 flex items-center gap-3 rounded-2xl cursor-pointer transition-all duration-200 group
                   ${selectedUser?._id === user._id 
-                    ? "bg-primary/10 ring-1 ring-primary/20" 
+                    ? "bg-[#a1c4fd]/10 ring-1 ring-[#a1c4fd]/20" 
                     : "hover:bg-base-200/50"}
                 `}
 							>

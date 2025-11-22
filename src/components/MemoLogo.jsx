@@ -7,7 +7,10 @@ const MemoLogo = () => {
   return (
     <div className="flex items-center gap-2 select-none">
       {/* 1. Static Icon (Brand Mark) */}
-      <div className="size-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+      <div 
+        className="size-9 rounded-xl flex items-center justify-center text-[#374151]" // UPDATED: Dark Icon
+        style={{ background: "linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%)" }} // ADDED: Gradient
+      >
         <MessageSquare className="size-5 font-bold" />
       </div>
 

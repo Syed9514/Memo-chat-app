@@ -3,7 +3,7 @@ import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Star, X, Image as ImageIcon } from "lucide-react";
 import ImageModal from "./ImageModal";
-import Avatar from "./Avatar";
+// import Avatar from "./Avatar";
 
 const ChatDetailsPanel = ({ onClose }) => {
   const { selectedUser, messages } = useChatStore();
@@ -59,12 +59,18 @@ const ChatDetailsPanel = ({ onClose }) => {
         </div>
 
         {/* Content Scroll Area */}
-        <div className='flex-1 p-4 space-y-6 overflow-y-auto'>
+        <div className='flex-1 p-4 space-y-6 overflow-y-auto no-scrollbar'>
           
           {/* --- 2. PROFILE GLASS CARD --- */}
           <div className="bg-base-100/50 rounded-3xl p-6 flex flex-col items-center border border-base-300/50 shadow-sm">
-            <div className="mb-4">
-               <Avatar user={selectedUser} size="size-24" />
+            <div className='avatar'>
+              {/* UPDATED: Changed ring-primary to ring-[#a1c4fd] */}
+              <div className='w-24 rounded-full ring ring-[#a1c4fd] ring-offset-base-100 ring-offset-2'>
+                <img
+                  src={selectedUser.profilePic || "/avatar.png"}
+                  alt={selectedUser.fullName}
+                />
+              </div>
             </div>
             
             <div className='flex items-center gap-2 mb-2'>
